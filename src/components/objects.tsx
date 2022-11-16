@@ -1,55 +1,34 @@
-import { MeshDistortMaterial, MeshReflectorMaterial, MeshWobbleMaterial, Plane, RoundedBox, Sphere } from '@react-three/drei';
-import { useRef, useState } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { MeshDistortMaterial, MeshReflectorMaterial, Plane, RoundedBox, Sphere } from '@react-three/drei';
+import { useFrame, useThree } from '@react-three/fiber'
+
+const palettes = [`#FFAE1C
+#BB160F
+#23D7F3
+#00461D
+#FF6FFF
+#0059AB`.split("\n")]
 
 export default function Objects() {
 
-    const sphere = useRef()
+    useFrame((state, delta) => {
+        console.log(delta)
+    })
 
-    const MIN_DISTORT = 0.5
-    const MAX_DISTORT = 1
-
-    const [ distort, setDistort ] = useState( MIN_DISTORT );
-
-    const incrementDistort = () => {
-        distort == MIN_DISTORT ? setDistort( MAX_DISTORT ) : setDistort( MIN_DISTORT );
-    }
-
-    // useEffect( () => {
-    //     console.log( distort )
-    // }, [ distort ] )
-
-    useFrame( ( state, delta ) => {
-        console.log( delta )
-    } )
-
+    useThree(({camera, scene}) => {
+        camera.position.set( -5, 5, 5 ); // all components equal
+        camera.lookAt( scene.position );
+      });
+      
 
     return (
         <>
-            <Sphere ref={sphere} args={ [ 1, 50, 100 ] } scale={ 1 } onClick={ incrementDistort }>
-                <MeshDistortMaterial
-                    wireframe={ false }
-                    color="#8352FD"
-                    attach="material"
-                    distort={ distort }
-                    speed={ 4 }
-                    roughness={ 0 } />
-            </Sphere>
-
-            <RoundedBox args={ [ 1, 1, 1 ] } position={ [ 2, 0, 0 ] }>
-                <MeshWobbleMaterial
-                    color="#f752fd"
-                    factor={ 1 }
-                    speed={ 1 } />
+        {
+        palettes.map(palette => palette.map((color, i) => {
+            return <RoundedBox args={[1, 1, 1]} position={[1.25*i-3.25, 0, 0]}>
+                <meshStandardMaterial color={color} />
             </RoundedBox>
-
-
-            <RoundedBox args={ [ 1, 1, 1 ] } position={ [ -2, 0, 0 ] }>
-                <MeshWobbleMaterial
-                    color="#f752fd"
-                    factor={ 1 }
-                    speed={ 1 } />
-            </RoundedBox>
+        }))
+        }
         </>
     )
 }
